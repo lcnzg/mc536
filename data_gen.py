@@ -203,7 +203,7 @@ def gerar_exames(nexame_start,cpfs_exist,locais_exist,ano_inicio,ano_final,quant
         sala = sortear(locais_exist)
         (idsala,tipo_sala,_) = sala
         while (tipo_sala != 'Exame'):
-            sala = sortear(locais)
+            sala = sortear(locais_exist)
             (idsala,tipo_sala,_) = sala
         locais.append(idsala)
 
@@ -241,13 +241,14 @@ def gerar_diagnosticos(ndiag_start,ids_exist,cpfs_exist,quantidade):
 Retorna lista de cirurgias = (ncirurgia,idsala,cpf,tipo,data,horario)
 '''
 def gerar_cirurgias(n_start,locais_exist,cpfs_exist,ano_inicio,ano_final,quantidade):
-    consultas = []
+    cirurgias = []
     ncirurgias = []
     idsalas = []
     cpfs = []
     tipos = []
     datas = []
     horarios = []
+    locais = []
 
     for i in range(quantidade):
 
@@ -256,7 +257,7 @@ def gerar_cirurgias(n_start,locais_exist,cpfs_exist,ano_inicio,ano_final,quantid
         sala = sortear(locais_exist)
         (idsala,tipo_sala,_) = sala
         while (tipo_sala != 'Cirurgia'):
-            sala = sortear(locais)
+            sala = sortear(locais_exist)
             (idsala,tipo_sala,_) = sala
         locais.append(idsala)
 
@@ -266,7 +267,7 @@ def gerar_cirurgias(n_start,locais_exist,cpfs_exist,ano_inicio,ano_final,quantid
         datas.append(gerar_data(ano_inicio,ano_final))
         horarios.append(gerar_horario(6,19))
 
-        consultas.append((ncirurgias[-1],idsalas[-1],cpfs[-1],tipos[-1],datas[-1],horarios[-1]))
+        cirurgias.append((ncirurgias[-1],locais[-1],cpfs[-1],tipos[-1],datas[-1],horarios[-1]))
     return cirurgias
 
 '''
@@ -295,6 +296,7 @@ def gerar_internacoes(locais_exist,cpfs_exist,ano_inicio,ano_final,quantidade):
     cpfs = []
     datas_entrada = []
     datas_saida = []
+    locais = []
 
     for _ in range(quantidade):
 
@@ -303,7 +305,7 @@ def gerar_internacoes(locais_exist,cpfs_exist,ano_inicio,ano_final,quantidade):
         sala = sortear(locais_exist)
         (idsala,tipo_sala,_) = sala
         while (tipo_sala != 'UTI' and tipo_sala != 'Quarto'):
-            sala = sortear(locais)
+            sala = sortear(locais_exist)
             (idsala,tipo_sala,_) = sala
         locais.append(idsala)
 
@@ -311,10 +313,10 @@ def gerar_internacoes(locais_exist,cpfs_exist,ano_inicio,ano_final,quantidade):
         dataAntes = gerar_data(ano_inicio,ano_final)
         dataDepois = gerarDataCoerente(dataAntes, ano_inicio, ano_final)
 
-        datas_entrada.append(diaAntes)
-        datas_saida.append(diaDepois)
+        datas_entrada.append(dataAntes)
+        datas_saida.append(dataDepois)
 
-        internacoes.append((idsalas[-1],cpfs[-1],datas_entrada[-1],datas_saida[-1]))
+        internacoes.append((locais[-1],cpfs[-1],datas_entrada[-1],datas_saida[-1]))
     return internacoes
 
 '''
@@ -345,17 +347,23 @@ def generate_database():
 
     #### GERANDO COMBINAÇÕES DE DADOS ###########
     medicos = gerar_medicos(1, 23)
-    (med_ids,_,_,_,_) = medicos
+    med_ids = [i[0] for i in medicos]
     enfermeiros = gerar_enfermeiros(30, 46)
     pacientes = gerar_pacientes(50)
-    (cpfs,_,_,_,_) = pacientes
+    cpfs = [i[0] for i in pacientes]
     salas = gerar_salas(50)
-    (idsalas,_,_) = salas
-    exames = gerar_exames(100,cpfs,idsalas,2010,2018,50)
+    idsalas = [i[0] for i in salas]
+    print('here')
+    exames = gerar_exames(100,cpfs,salas,2010,2018,50)
+    print('exams generated')
     diagnosticos = gerar_diagnosticos(5,med_ids,cpfs,50)
-    cirurgias = gerar_cirurgias(200,idsalas,cpfs,2014,2019,25)
-    internacoes = gerar_internacoes(idsalas,cpfs,2010,2018,15)
+    print('diags generated')
+    cirurgias = gerar_cirurgias(200,salas,cpfs,2014,2019,25)
+    print('cir generated')
+    internacoes = gerar_internacoes(salas,cpfs,2010,2018,15)
+    print('inter generated')
     consultas = gerar_consultas(med_ids,cpfs,2010,2018,50)
+    print('consults generated')
 
     #### Vetor onde serão inseridos os comandos sql para inicialização do BD
     setup_commands = []

@@ -68,9 +68,9 @@ ESPECIALIDADES = ['Anestesia','Imunologia','Cardiologia','Pediatria','Cirurgia G
 TIPOS_SALAS = ['Cirurgia','Quarto','UTI','Consultorio','Exame']
 TIPOS_EXAMES = ['Raio X','Mamografia','Desintometria óssea','Ressonância Magnética','Tomografia Computadorizada'
 ,'Ultra-sonografia','Endoscopia','Hemograma','Urografia','Ecodoppler']
-TIPOS_PATOLOGIAS = [] #TODO
-TIPOS_SINTOMAS = [] #TODO
-TIPOS_CIRURGIAS = [] #TODO
+TIPOS_PATOLOGIAS = ['Asma', 'Diabetes', 'AVC', 'Infarte', 'Pneumonia', 'Dengue', 'Gripe', 'Bronquite', 'Micose', 'Intoxicação Alimentar']
+TIPOS_SINTOMAS = ['Coceira', 'Febre', 'Coriza', 'Dor de cabeça', 'Dor no corpo', 'Nariz sangrando', 'Hipertensão', 'Garganta inflamada', 'Desidratação']
+TIPOS_CIRURGIAS = ['Rinoplastia', 'Ortoplastia', 'Ninfoplastia', 'Mamoplastia', 'Lipoaspiração', 'Biópsia', 'Endoscopia', 'Fimose']
 
 '''
 Retorna lista de pacientes = (cpf,nome,data,genero,tiposang)
@@ -289,7 +289,7 @@ def gerar_internacoes(locais_exist,cpfs_exist,ano_inicio,ano_final,quantidade):
 
         sala = sortear(locais_exist)
         (idsala,tipo_sala,_) = sala
-        while (tipo_sala != 'UTI' && tipo_sala != 'Quarto'):
+        while (tipo_sala != 'UTI' and tipo_sala != 'Quarto'):
             sala = sortear(locais)
             (idsala,tipo_sala,_) = sala
         locais.append(idsala)

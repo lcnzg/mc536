@@ -270,8 +270,25 @@ def gerar_cirurgias(n_start,locais_exist,cpfs_exist,ano_inicio,ano_final,quantid
     return cirurgias
 
 '''
-TODO: Retorna lista de internacoes = (idsala,cpf,data_entrada,data_alta)
+Retorna lista de internacoes = (idsala,cpf,data_entrada,data_alta)
 '''
+
+def gerarDataCoerente(dataAntes, ano_inicio, ano_final):
+    anoA = dataAntes[0:4]
+    mesA = dataAntes[5:7]
+    diaA = dataAntes[8:10]
+    dataDepois = gerar_data(ano_inicio, ano_final)
+    anoD = dataDepois[0:4]
+    mesD = dataDepois[5:7]
+    diaD = dataDepois[8:10]
+    while(not(anoA<=anoD and mesA<=mesD and diaA<=diaD)):
+        dataDepois = gerar_data(ano_inicio, ano_final)
+        anoD = dataDepois[0:4]
+        mesD = dataDepois[5:7]
+        diaD = dataDepois[8:10]
+    return dataDepois
+
+
 def gerar_internacoes(locais_exist,cpfs_exist,ano_inicio,ano_final,quantidade):
     internacoes = []
     idsalas = []
@@ -290,9 +307,12 @@ def gerar_internacoes(locais_exist,cpfs_exist,ano_inicio,ano_final,quantidade):
             (idsala,tipo_sala,_) = sala
         locais.append(idsala)
 
-        # TODO: data entrada tem que ser menor que saida
-        datas_entrada.append(gerar_data(ano_inicio,ano_final))
-        datas_saida.append(gerar_data(ano_inicio,ano_final))
+        #data entrada tem que ser menor que saida
+        dataAntes = gerar_data(ano_inicio,ano_final)
+        dataDepois = gerarDataCoerente(dataAntes, ano_inicio, ano_final)
+
+        datas_entrada.append(diaAntes)
+        datas_saida.append(diaDepois)
 
         internacoes.append((idsalas[-1],cpfs[-1],datas_entrada[-1],datas_saida[-1]))
     return internacoes

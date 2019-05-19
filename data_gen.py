@@ -215,7 +215,7 @@ def gerar_exames(nexame_start,cpfs_exist,locais_exist,ano_inicio,ano_final,quant
     return exames
 
 '''
-TODO: Retorna lista de diagnosticos = (ndiag,cpf,idmedico,patologia,sintomas)
+Retorna lista de diagnosticos = (ndiag,cpf,idmedico,patologia,sintomas)
 '''
 def gerar_diagnosticos(ndiag_start,ids_exist,cpfs_exist,quantidade):
     diagnosticos = []
@@ -231,8 +231,6 @@ def gerar_diagnosticos(ndiag_start,ids_exist,cpfs_exist,quantidade):
 
         cpfs.append(sortear(cpfs_exist))
         ids.append(sortear(ids_exist))
-
-        # TODO: escrever tipos de sintomas e patologias
         patologias.append(sortear(TIPOS_PATOLOGIAS))
         sintomas.append(sortear(TIPOS_SINTOMAS))
 
@@ -240,7 +238,7 @@ def gerar_diagnosticos(ndiag_start,ids_exist,cpfs_exist,quantidade):
     return diagnosticos
 
 '''
-TODO: Retorna lista de cirurgias = (ncirurgia,idsala,cpf,tipo,data,horario)
+Retorna lista de cirurgias = (ncirurgia,idsala,cpf,tipo,data,horario)
 '''
 def gerar_cirurgias(n_start,locais_exist,cpfs_exist,ano_inicio,ano_final,quantidade):
     consultas = []
@@ -263,8 +261,6 @@ def gerar_cirurgias(n_start,locais_exist,cpfs_exist,ano_inicio,ano_final,quantid
         locais.append(idsala)
 
         cpfs.append(sortear(cpfs_exist))
-
-        # TODO: escrever tipos de cirurgia
         tipos.append(sortear(TIPOS_CIRURGIAS))
 
         datas.append(gerar_data(ano_inicio,ano_final))

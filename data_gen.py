@@ -46,14 +46,18 @@ def gerar_crm(estados):
 def gerar_data(ano_inicial, ano_final):
     ano = randint(ano_inicial,ano_final)
     mes = randint(1,12)
-    dia = randint(1,30)
+    if(mes == 2):
+      dia = randint(1,28)
+    else:
+      dia = randint(1,30)
     return "%04d-%02d-%02d" % (ano,mes,dia)
 
 # formato HH:MM
 def gerar_horario(hora_inicial, hora_final):
     hora = randint(hora_inicial,hora_final)
-    minuto = randint(0,60)
-    return "%02d:%02d" % (hora,minuto)
+    minuto = randint(0,59)
+    segundo = randint(0,59)
+    return "%02d:%02d:%02d" % (hora,minuto, segundo)
 
 ### Geradores
 PEOPLE_NAMES_H = ['Diogo','Felipe','Matheus','Vinicius','Leonardo','Otávio','Rodrigo','Kauê','Samuel','Tiago'] # homens
@@ -373,10 +377,10 @@ def generate_database():
     'CREATE TABLE Funcionario (ID int NOT NULL, CPF varchar(11) NOT NULL, Nome varchar(50) NOT NULL, PRIMARY KEY(ID));',
     'CREATE TABLE Medico (ID int NOT NULL, CRM varchar(12) NOT NULL, Especialidade varchar(50), PRIMARY KEY(ID), FOREIGN KEY (ID) REFERENCES Funcionario(ID));',
     'CREATE TABLE Enfermeiro (ID int NOT NULL, Setor varchar(50), PRIMARY KEY(ID), FOREIGN KEY (ID) REFERENCES Funcionario(ID));',
-    'CREATE TABLE Paciente (CPF varchar(11) NOT NULL, Nome varchar(50) NOT NULL, DataNascimento DATE NOT NULL, Genero char(1) NOT NULL, TipoSang varchar(2) NOT NULL, PRIMARY KEY(CPF));',
+    'CREATE TABLE Paciente (CPF varchar(11) NOT NULL, Nome varchar(50) NOT NULL, DataNascimento DATE NOT NULL, Genero char(1) NOT NULL, TipoSang varchar(3) NOT NULL, PRIMARY KEY(CPF));',
     'CREATE TABLE Exame (NExame int NOT NULL, CPF varchar(11) NOT NULL, Tipo varchar(50) NOT NULL, Data Date, Horario Time(0), Local varchar(50), PRIMARY KEY(NExame), FOREIGN KEY (CPF) REFERENCES Paciente(CPF));',
     'CREATE TABLE Diagnostico (NDiag int NOT NULL, CPF varchar(11) NOT NULL, IDMedico int NOT NULL, Patologia varchar(100), Sintomas varchar(500), PRIMARY KEY(NDiag), FOREIGN KEY (CPF) REFERENCES Paciente(CPF), FOREIGN KEY (IDMedico) REFERENCES Medico(ID));',
-    'CREATE TABLE Sala (IDSala varchar(5) NOT NULL, Tipo varchar(50), Capacidade int, PRIMARY KEY(IDSala));',
+    'CREATE TABLE Sala (IDSala int NOT NULL, Tipo varchar(50), Capacidade int, PRIMARY KEY(IDSala));',
     'CREATE TABLE Cirurgia (NCirurgia int NOT NULL, IDSala int NOT NULL, CPF varchar(11) NOT NULL, Tipo varchar(50) NOT NULL, Data Date NOT NULL, Horario Time(0) NOT NULL, PRIMARY KEY(NCirurgia), FOREIGN KEY (IDSala) REFERENCES Sala(IDSala), FOREIGN KEY (CPF) REFERENCES Paciente(CPF));',
     'CREATE TABLE Internacao (IDSala int NOT NULL, CPF varchar(11) NOT NULL, Data_entrada Date NOT NULL, Data_alta Date, PRIMARY KEY (CPF, Data_entrada), FOREIGN KEY (IDSala) REFERENCES Sala(IDSala), FOREIGN KEY (CPF) REFERENCES Paciente(CPF));',
     'CREATE TABLE Consulta (ID int NOT NULL, CPF varchar(11) NOT NULL, Data Date NOT NULL, PRIMARY KEY (ID,CPF,Data), FOREIGN KEY (ID) REFERENCES Medico(ID), FOREIGN KEY (CPF) REFERENCES Paciente(CPF));'
@@ -386,40 +390,40 @@ def generate_database():
 
     # Medico
     for (id,cpf,nome,crm,especialidade) in medicos:
-        setup_commands.append("INSERT INTO Funcionario VALUES ("+str(id)+","+str(cpf)+",'"+nome+"');")
-        setup_commands.append("INSERT INTO Medico VALUES ("+str(id)+","+crm+",'"+especialidade+"');")
+        setup_commands.append("INSERT INTO Funcionario VALUES ("+str(id)+",'"+str(cpf)+"','"+nome+"');")
+        setup_commands.append("INSERT INTO Medico VALUES ("+str(id)+",'"+crm+"','"+especialidade+"');")
 
     # Enfermeiro
     for (id,cpf,nome,setor) in enfermeiros:
-        setup_commands.append("INSERT INTO Funcionario VALUES ("+str(id)+","+str(cpf)+",'"+nome+"');")
+        setup_commands.append("INSERT INTO Funcionario VALUES ("+str(id)+",'"+str(cpf)+"','"+nome+"');")
         setup_commands.append("INSERT INTO Enfermeiro VALUES ("+str(id)+",'"+setor+"');")
 
     # Paciente
     for (cpf,nome,data,genero,tiposang) in pacientes:
-        setup_commands.append("INSERT INTO Pessoa VALUES ("+str(cpf)+",'"+nome+"',"+data+","+genero+","+tiposang+");")
+        setup_commands.append("INSERT INTO Paciente VALUES ('"+str(cpf)+"','"+nome+"','"+data+"','"+genero+"','"+tiposang+"');")
 
     # Sala
     for (idsala,tipo,capacidade) in salas:
-        setup_commands.append("INSERT INTO Sala VALUES ("+str(id)+",'"+tipo+"',"+str(capacidade)+");")
+        setup_commands.append("INSERT INTO Sala VALUES ("+str(idsala)+",'"+tipo+"',"+str(capacidade)+");")
 
     # Exame
     for (nexame,cpf,tipo,data,horario,local) in exames:
-        setup_commands.append("INSERT INTO Exame VALUES ("+str(nexame)+","+str(cpf)+",'"+tipo+"',"+data+","+horario+","+str(local)+");")
+        setup_commands.append("INSERT INTO Exame VALUES ("+str(nexame)+",'"+str(cpf)+"','"+tipo+"','"+data+"','"+horario+"','"+str(local)+"');")
 
     # Diagnostico
     for (ndiag,cpf,idmedico,patologia,sintomas) in diagnosticos:
-        setup_commands.append("INSERT INTO Diagnostico VALUES ("+str(ndiag)+","+str(cpf)+","+str(idmedico)+",'"+patologia+"','"+sintomas+"');")
+        setup_commands.append("INSERT INTO Diagnostico VALUES ("+str(ndiag)+",'"+str(cpf)+"',"+str(idmedico)+",'"+patologia+"','"+sintomas+"');")
 
     # Cirurgia
     for (ncirurgia,idsala,cpf,tipo,data,horario) in cirurgias:
-        setup_commands.append("INSERT INTO Cirurgia VALUES ("+str(ncirurgia)+","+str(idsala)+","+str(cpf)+",'"+tipo+"',"+data+","+horario+");")
+        setup_commands.append("INSERT INTO Cirurgia VALUES ("+str(ncirurgia)+","+str(idsala)+",'"+str(cpf)+"','"+tipo+"','"+data+"','"+horario+"');")
 
     # Internacao
     for (idsala,cpf,data_entrada,data_alta) in internacoes:
-        setup_commands.append("INSERT INTO Internacao VALUES ("+str(idsala)+","+str(cpf)+","+data_entrada+","+data_alta+");")
+        setup_commands.append("INSERT INTO Internacao VALUES ("+str(idsala)+",'"+str(cpf)+"','"+data_entrada+"','"+data_alta+"');")
 
     # Consulta
     for (id,cpf,data) in consultas:
-        setup_commands.append("INSERT INTO Consulta VALUES ("+str(id)+","+str(cpf)+","+data+");")
+        setup_commands.append("INSERT INTO Consulta VALUES ("+str(id)+",'"+str(cpf)+"','"+data+"');")
 
     return setup_commands

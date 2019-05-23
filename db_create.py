@@ -72,6 +72,13 @@ while (1):
 					for r in response:
 						print(r)
 					input("Aperte Enter ao terminar")
+			elif (entry == '3'):
+				cpfPaciente = input("Digite o CPF do paciente: ")
+				cur.execute("SELECT Nome, Tipo, Data, Horario, Local FROM Paciente INNER JOIN Exame ON Exame.CPF=Paciente.CPF WHERE Paciente.CPF='"+cpfPaciente+"';")
+				response = cur.fetchall()
+				for r in response:
+					print(r)
+				input("Aperte Enter ao terminar")
 	elif (entry == '2'):
 		while(1):
 			print("Escolha o tipo de consulta a fazer:\n\t1 - Consultar paciente por nome\n\t2 - Consultar paciente por CPF\nPara sair escolha 0")

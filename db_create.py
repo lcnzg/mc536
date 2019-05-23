@@ -55,13 +55,22 @@ while (1):
 			if (entry == '0'):
 				break
 			elif (entry == '1'):
-				cur.execute("SELECT * FROM funcionario\
+				cur.execute("SELECT paciente.nome, idsala, tipo, data, horario FROM funcionario\
 					INNER JOIN realiza_cirurgia ON realiza_cirurgia.ID=funcionario.ID\
+					INNER JOIN cirurgia ON cirurgia.ncirurgia=realiza_cirurgia.ncirurgia\
+					INNER JOIN paciente ON cirurgia.cpf=paciente.cpf\
 					WHERE funcionario.ID="+medId+";")
 				response = cur.fetchall()
-				for r in response:
-					print(str(r))
-				input("Aperte Enter ao terminar")
+				if (response):
+					col_width = max(len(str(word)) for row in response for word in row) + 2
+					header = [["Paciente", "Sala", "Tipo", "Data", "Horário"]]
+					for row in header:
+						print ("".join(str(word).ljust(col_width) for word in row))
+					for row in response:
+						print("".join(str(word).ljust(col_width) for word in row))
+					input("Aperte Enter ao terminar")
+				else:
+					input("Nenhuma cirurgia. Aperte Enter para retornar")
 			elif (entry == '2'):
 				print("Escolha o tipo de consulta a fazer:\
 					\n\t1 - Consultar paciente por nome\

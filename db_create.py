@@ -41,12 +41,12 @@ while (1):
 		medId = input("Digite seu ID: ")
 		while(1):
 			clear()
-			print("Escolha o tipo de consulta a fazer:\n\t1 - Consultar cirurgias a fazer\n\t2 - Consultar pacientes\n\t3 - Consultar exames de um paciente\n\t 4 - Consultar diagnósticos de um paciente\n\t0 - Para retornar")
+			print("Escolha o tipo de consulta a fazer:\n\t1 - Consultar cirurgias a fazer\n\t2 - Consultar pacientes\n\t3 - Consultar exames de um paciente\n\t4 - Consultar diagnósticos de um paciente\n\t0 - Para retornar")
 			entry = input("Escolha um número: ")
 			if (entry == '0'):
 				break
 			elif (entry == '1'):
-				cur.execute("SELECT * FROM cirurgia INNER JOIN realiza_cirurgia on realiza_cirurgia.ID="+medId+";")
+				cur.execute("SELECT * FROM funcionario INNER JOIN realiza_cirurgia on realiza_cirurgia.ID=funcionario.ID WHERE funcionario.ID="+medId+";")
 				response = cur.fetchall()
 				for r in response:
 					print(str(r))
@@ -79,16 +79,40 @@ while (1):
 				for r in response:
 					print(r)
 				input("Aperte Enter ao terminar")
+			elif (entry == '4'):
+				cpfPaciente = input("Digite o CPF do paciente: ")
+				cur.execute("SELECT Nome, Patologia, SIntomas FROM Paciente INNER JOIN Diagnostico ON Diagnostico.CPF=Paciente.CPF WHERE Paciente.CPF='"+cpfPaciente+"';")
+				response = cur.fetchall()
+				for r in response:
+					print(r)
+				input("Aperte Enter ao terminar")	
 	elif (entry == '2'):
+		enfId = input("Digite seu ID: ")
 		while(1):
-			print("Escolha o tipo de consulta a fazer:\n\t1 - Consultar paciente por nome\n\t2 - Consultar paciente por CPF\nPara sair escolha 0")
+			print("Escolha o tipo de consulta a fazer:\n\t1 - Consultar cirurgias\n\t2 - Consultar paciente por nome\n\t3 - Consultar internações\n\tPara sair escolha 0")
 			entry = input("Escolha um número: ")
 			if (entry == '0'):
 				break
 			elif (entry == '1'):
-				entry = input("Escolha um nome: ")
-				cur.execute("SELECT * FROM funcionario, medico WHERE Nome='"+entry+"' AND funcionario.ID=medico.ID;")
-				print(cur.fetchall())
+				cur.execute("SELECT * FROM funcionario INNER JOIN Realiza_cirurgia ON funcionario.ID=Realiza_cirurgia.ID WHERE funcionario.Id='"+enfId+"';")
+				response = cur.fetchall()
+				for r in response:
+					print(r)
+				input("Aperte Enter ao terminar")
+			elif (entry == '2'):
+				nomePaciente = input("Digite o nome desejado: ")
+				cur.execute("SELECT * FROM Paciente WHERE Nome='"+nomePaciente+"';")
+				response = cur.fetchall()
+				for r in response:
+					print(r)
+				input("Aperte Enter ao terminar")
+			elif (entry == '3'):
+				cpfPaciente = input("Digite o CPF do paciente: ")
+				cur.execute("SELECT * FROM Paciente INNER JOIN Internacao ON Internacao.CPF='"+cpfPaciente+"';")
+				response = cur.fetchall()
+				for r in response:
+					print(r)
+				input("Aperte Enter ao terminar")
 	elif (entry == '3'):
 		while(1):
 			print("Escolha o tipo de consulta a fazer:\n\t1 - Consultar todos os médicos\n\t2 -Consultar médicos por nome\nPara sair escolha 0")

@@ -426,6 +426,17 @@ def generate_database():
           medico2 = choice(medicos)[0] 
         setup_commands.append("INSERT INTO Realiza_cirurgia VALUES("+str(ncirurgia)+", "+str(medico2)+");")
 
+        enf1 = choice(enfermeiros)[0]
+        setup_commands.append("INSERT INTO Realiza_cirurgia VALUES("+str(ncirurgia)+", "+str(enf1)+");")
+        enf2 = choice(enfermeiros)[0]
+        while (enf2 == enf1):
+          enf2 = choice(enfermeiros)[0] 
+        setup_commands.append("INSERT INTO Realiza_cirurgia VALUES("+str(ncirurgia)+", "+str(enf2)+");")
+        enf3 = choice(enfermeiros)[0]
+        while (enf3 == enf2 or enf3 == enf1):
+            enf3 = choice(enfermeiros)[0]
+        setup_commands.append("INSERT INTO Realiza_cirurgia VALUES("+str(ncirurgia)+", "+str(enf3)+");")
+
     # Internacao
     for (idsala,cpf,data_entrada,data_alta) in internacoes:
         setup_commands.append("INSERT INTO Internacao VALUES ("+str(idsala)+",'"+str(cpf)+"','"+data_entrada+"','"+data_alta+"');")

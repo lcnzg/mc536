@@ -32,7 +32,11 @@ db.commit()
 
 while (1):
 	clear()
-	print("Escolha o tipo de usuário:\n\t1 - Médico\n\t2 - Enfermeiro\n\t3 - Paciente\nPara sair escolha 0")
+	print("Escolha o tipo de usuário:\
+		\n\t1 - Médico\
+		\n\t2 - Enfermeiro\
+		\n\t3 - Paciente\
+		\nPara sair escolha 0")
 	entry = input("Escolha um número: ")
 
 	if (entry == '0'):
@@ -41,18 +45,28 @@ while (1):
 		medId = input("Digite seu ID: ")
 		while(1):
 			clear()
-			print("Escolha o tipo de consulta a fazer:\n\t1 - Consultar cirurgias a fazer\n\t2 - Consultar pacientes\n\t3 - Consultar exames de um paciente\n\t4 - Consultar diagnósticos de um paciente\n\t0 - Para retornar")
+			print("Escolha o tipo de consulta a fazer:\
+				\n\t1 - Consultar cirurgias a fazer\
+				\n\t2 - Consultar pacientes\
+				\n\t3 - Consultar exames de um paciente\
+				\n\t4 - Consultar diagnósticos de um paciente\
+				\n\t0 - Para retornar")
 			entry = input("Escolha um número: ")
 			if (entry == '0'):
 				break
 			elif (entry == '1'):
-				cur.execute("SELECT * FROM funcionario INNER JOIN realiza_cirurgia on realiza_cirurgia.ID=funcionario.ID WHERE funcionario.ID="+medId+";")
+				cur.execute("SELECT * FROM funcionario\
+					INNER JOIN realiza_cirurgia ON realiza_cirurgia.ID=funcionario.ID\
+					WHERE funcionario.ID="+medId+";")
 				response = cur.fetchall()
 				for r in response:
 					print(str(r))
 				input("Aperte Enter ao terminar")
 			elif (entry == '2'):
-				print("Escolha o tipo de consulta a fazer:\n\t1 - Consultar paciente por nome\n\t2 - Consultar paciente por CPF\n\tPara retornar escolha 0")
+				print("Escolha o tipo de consulta a fazer:\
+					\n\t1 - Consultar paciente por nome\
+					\n\t2 - Consultar paciente por CPF\
+					\n\tPara retornar escolha 0")
 				entry = input("Escolha um número: ")
 				if (entry == '0'):
 					continue
@@ -74,14 +88,18 @@ while (1):
 					input("Aperte Enter ao terminar")
 			elif (entry == '3'):
 				cpfPaciente = input("Digite o CPF do paciente: ")
-				cur.execute("SELECT Nome, Tipo, Data, Horario, Local FROM Paciente INNER JOIN Exame ON Exame.CPF=Paciente.CPF WHERE Paciente.CPF='"+cpfPaciente+"';")
+				cur.execute("SELECT Nome, Tipo, Data, Horario, Local FROM Paciente\
+					INNER JOIN Exame ON Exame.CPF=Paciente.CPF\
+					WHERE Paciente.CPF='"+cpfPaciente+"';")
 				response = cur.fetchall()
 				for r in response:
 					print(r)
 				input("Aperte Enter ao terminar")
 			elif (entry == '4'):
 				cpfPaciente = input("Digite o CPF do paciente: ")
-				cur.execute("SELECT Nome, Patologia, SIntomas FROM Paciente INNER JOIN Diagnostico ON Diagnostico.CPF=Paciente.CPF WHERE Paciente.CPF='"+cpfPaciente+"';")
+				cur.execute("SELECT Nome, Patologia, SIntomas FROM Paciente\
+					INNER JOIN Diagnostico ON Diagnostico.CPF=Paciente.CPF\
+					WHERE Paciente.CPF='"+cpfPaciente+"';")
 				response = cur.fetchall()
 				for r in response:
 					print(r)
@@ -89,12 +107,19 @@ while (1):
 	elif (entry == '2'):
 		enfId = input("Digite seu ID: ")
 		while(1):
-			print("Escolha o tipo de consulta a fazer:\n\t1 - Consultar cirurgias\n\t2 - Consultar paciente por nome\n\t3 - Consultar internações\n\tPara sair escolha 0")
+			clear()
+			print("Escolha o tipo de consulta a fazer:\
+				\n\t1 - Consultar cirurgias\
+				\n\t2 - Consultar paciente por nome\
+				\n\t3 - Consultar internações\
+				\n\tPara sair escolha 0")
 			entry = input("Escolha um número: ")
 			if (entry == '0'):
 				break
 			elif (entry == '1'):
-				cur.execute("SELECT * FROM funcionario INNER JOIN Realiza_cirurgia ON funcionario.ID=Realiza_cirurgia.ID WHERE funcionario.Id='"+enfId+"';")
+				cur.execute("SELECT * FROM funcionario\
+					INNER JOIN Realiza_cirurgia ON funcionario.ID=Realiza_cirurgia.ID\
+					WHERE funcionario.Id='"+enfId+"';")
 				response = cur.fetchall()
 				for r in response:
 					print(r)
@@ -108,21 +133,58 @@ while (1):
 				input("Aperte Enter ao terminar")
 			elif (entry == '3'):
 				cpfPaciente = input("Digite o CPF do paciente: ")
-				cur.execute("SELECT * FROM Paciente INNER JOIN Internacao ON Internacao.CPF='"+cpfPaciente+"';")
+				cur.execute("SELECT * FROM Paciente\
+					INNER JOIN Internacao ON Internacao.CPF=Paciente.CPF\
+					WHERE Paciente.CPF='"+cpfPaciente+"';")
 				response = cur.fetchall()
 				for r in response:
 					print(r)
 				input("Aperte Enter ao terminar")
 	elif (entry == '3'):
+		cpfPaciente = input("Digite seu CPF: ")
 		while(1):
-			print("Escolha o tipo de consulta a fazer:\n\t1 - Consultar todos os médicos\n\t2 -Consultar médicos por nome\nPara sair escolha 0")
+			clear()
+			print("Escolha o tipo de consulta a fazer:\
+				\n\t1 - Consultar cirurgias a fazer\
+				\n\t2 - Consultar internação\
+				\n\t3 - Constular exames\
+				\n\t4 - Consultar diagnósticos\
+				\n\tPara sair escolha 0")
 			entry = input("Escolha um número: ")
 			if (entry == '0'):
 				break
 			elif (entry == '1'):
-				entry = input("Escolha um nome: ")
-				cur.execute("SELECT * FROM funcionario, medico WHERE Nome='"+entry+"' AND funcionario.ID=medico.ID;")
-				print(cur.fetchall())
+				cur.execute("SELECT * FROM paciente\
+					INNER JOIN cirurgia ON paciente.CPF = cirurgia.CPF\
+					WHERE paciente.CPF='"+cpfPaciente+"';")
+				response = cur.fetchall()
+				for r in response:
+					print(r)
+				input("Aperte Enter ao terminar")
+			elif (entry == '2'):
+				cur.execute("SELECT * FROM paciente\
+					INNER JOIN internacao ON paciente.CPF=internacao.CPF\
+					WHERE paciente.CPF='"+cpfPaciente+"';")
+				response = cur.fetchall()
+				for r in response:
+					print(r)
+				input("Aperte Enter ao terminar")
+			elif (entry == '3'):
+				cur.execute("SELECT * FROM paciente\
+					INNER JOIN exame ON paciente.CPF=exame.CPF\
+					WHERE paciente.CPF='"+cpfPaciente+"';")
+				response = cur.fetchall()
+				for r in response:
+					print(r)
+				input("Aperte Enter ao terminar")
+			elif (entry == '4'):
+				cur.execute("SELECT * FROM paciente\
+					INNER JOIN diagnostico ON paciente.CPF=diagnostico.CPF\
+					WHERE paciente.CPF='"+cpfPaciente+"';")
+				response = cur.fetchall()
+				for r in response:
+					print(r)
+				input("Aperte Enter ao terminar")
 	else:
 		print("Entrada não válida\n")
 

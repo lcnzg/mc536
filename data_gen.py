@@ -378,7 +378,7 @@ def generate_database():
     'CREATE TABLE Medico (ID int NOT NULL, CRM varchar(12) NOT NULL, Especialidade varchar(50), PRIMARY KEY(ID), FOREIGN KEY (ID) REFERENCES Funcionario(ID));',
     'CREATE TABLE Enfermeiro (ID int NOT NULL, Setor varchar(50), PRIMARY KEY(ID), FOREIGN KEY (ID) REFERENCES Funcionario(ID));',
     'CREATE TABLE Paciente (CPF varchar(11) NOT NULL, Nome varchar(50) NOT NULL, DataNascimento DATE NOT NULL, Genero char(1) NOT NULL, TipoSang varchar(3) NOT NULL, PRIMARY KEY(CPF));',
-    'CREATE TABLE Exame (NExame int NOT NULL, CPF varchar(11) NOT NULL, Tipo varchar(50) NOT NULL, Data Date, Horario Time(0), Local varchar(50), PRIMARY KEY(NExame), FOREIGN KEY (CPF) REFERENCES Paciente(CPF));',
+    'CREATE TABLE Exame (NExame int NOT NULL, ID_medico int NOT NULL, CPF varchar(11) NOT NULL, Tipo varchar(50) NOT NULL, Data Date, Horario Time(0), Local varchar(50), PRIMARY KEY(NExame), FOREIGN KEY (ID_medico) REFERENCES Medico(ID), FOREIGN KEY (CPF) REFERENCES Paciente(CPF));',
     'CREATE TABLE Diagnostico (NDiag int NOT NULL, CPF varchar(11) NOT NULL, IDMedico int NOT NULL, Patologia varchar(100), Sintomas varchar(500), PRIMARY KEY(NDiag), FOREIGN KEY (CPF) REFERENCES Paciente(CPF), FOREIGN KEY (IDMedico) REFERENCES Medico(ID));',
     'CREATE TABLE Sala (IDSala int NOT NULL, Tipo varchar(50), Capacidade int, PRIMARY KEY(IDSala));',
     'CREATE TABLE Cirurgia (NCirurgia int NOT NULL, IDSala int NOT NULL, CPF varchar(11) NOT NULL, Tipo varchar(50) NOT NULL, Data Date NOT NULL, Horario Time(0) NOT NULL, PRIMARY KEY(NCirurgia), FOREIGN KEY (IDSala) REFERENCES Sala(IDSala), FOREIGN KEY (CPF) REFERENCES Paciente(CPF));',
@@ -409,7 +409,7 @@ def generate_database():
 
     # Exame
     for (nexame,cpf,tipo,data,horario,local) in exames:
-        setup_commands.append("INSERT INTO Exame VALUES ("+str(nexame)+",'"+str(cpf)+"','"+tipo+"','"+data+"','"+horario+"','"+str(local)+"');")
+        setup_commands.append("INSERT INTO Exame VALUES ("+str(nexame)+",'"+str(choice(medicos)[0])+"', '"+str(cpf)+"','"+tipo+"','"+data+"','"+horario+"','"+str(local)+"');")
 
     # Diagnostico
     for (ndiag,cpf,idmedico,patologia,sintomas) in diagnosticos:

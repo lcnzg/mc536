@@ -15,17 +15,19 @@ def imprimir_resposta(response, header):
 			print("".join(str(word).ljust(col_width) for word in row))
 		input("Aperte Enter ao terminar")
 	else:
-		input("Nenhuma cirurgia. Aperte Enter para retornar")
+		input("Nenhum registro encontrado. Aperte Enter para retornar")
 
 clear = lambda: os.system('cls')
 
 # Open database connection
+print("Conectanto ao banco")
 db = pymysql.connect("localhost", "jonathas", passwd="EiC9Shei", db="mc536")
 
 cur = db.cursor()
 
 setup_commands = generate_database()
 
+print("Limpando tabelas")
 cur.execute("DROP TABLE IF EXISTS realiza_cirurgia;") 
 cur.execute("DROP TABLE IF EXISTS cirurgia;") 
 cur.execute("DROP TABLE IF EXISTS exame;") 
@@ -38,10 +40,11 @@ cur.execute("DROP TABLE IF EXISTS enfermeiro;")
 cur.execute("DROP TABLE IF EXISTS funcionario;")  
 cur.execute("DROP TABLE IF EXISTS sala;") 
 
+print("Gerando dados")
 for command in setup_commands:
-  print(command)
   cur.execute(command)
 
+print("Submetendo comandos")
 db.commit()
 
 while (1):
@@ -63,10 +66,13 @@ while (1):
 		while(1):
 			clear()
 			print("Escolha o tipo de consulta a fazer:\
-				\n\t1 - Consultar cirurgias a fazer\
-				\n\t2 - Consultar pacientes\
-				\n\t3 - Consultar exames de um paciente\
-				\n\t4 - Consultar diagnósticos de um paciente\
+				\n\t1 - Cirurgias\
+				\n\t2 - Pacientes cadastrados\
+				\n\t3 - Exames pedidos\
+				\n\t4 - Diagnósticos feitos\
+				\n\t5 - Consultas realizadas\
+				\n\t6 - Internações\
+				\n\t7 - Funcionários\
 				\n\t0 - Para retornar")
 			entry = input("Escolha um número: ")
 
@@ -99,7 +105,7 @@ while (1):
 				elif (entry == '1'):
 					nomePaciente = input("Digite o nome desejado: ")
 					cur.execute("SELECT nome, cpf, datanascimento, genero, tiposang\
-						FROM Paciente WHERE Nome LIKE'"+nomePaciente+"%';")
+						FROM Paciente WHERE Nome LIKE'%"+nomePaciente+"%';")
 					
 					header = [["Nome", "CPF", "Data Nascimento", "Gênero", "Tipo Sanguíneo"]]
 					imprimir_resposta(cur.fetchall(), header)
@@ -117,23 +123,95 @@ while (1):
 
 			# Caso escolha consultar exame de paciente
 			elif (entry == '3'):
-				cpfPaciente = input("Digite o CPF do paciente: ")
-				cur.execute("SELECT Nome, Tipo, Data, Horario, Local FROM Paciente\
-					INNER JOIN Exame ON Exame.CPF=Paciente.CPF\
-					WHERE Paciente.CPF='"+cpfPaciente+"';")
+				cur.execute("SELECT paciente.Nome, Tipo, Data, Horario, Local FROM funcionario\
+					INNER JOIN Exame ON Exame.ID_medico=funcionario.ID\
+					INNER JOIN paciente ON paciente.cpf=exame.cpf\
+					WHERE funcionario.id="+medId+";")
 
 				header = [["Nome", "Tipo", "Data", "Horário", "Sala"]]
 				imprimir_resposta(cur.fetchall(), header)
 
-			# Caso escolha consultar diagnósticos de paciente
+			# Caso escolha consultar diagnósticos feitos
 			elif (entry == '4'):
-				cpfPaciente = input("Digite o CPF do paciente: ")
-				cur.execute("SELECT Nome, Patologia, SIntomas FROM Paciente\
-					INNER JOIN Diagnostico ON Diagnostico.CPF=Paciente.CPF\
-					WHERE Paciente.CPF='"+cpfPaciente+"';")
+				cur.execute("SELECT Paciente.Nome, Patologia, SIntomas FROM funcionario\
+					INNER JOIN Diagnostico ON Diagnostico.IDmedico=funcionario.ID\
+					INNER JOIN paciente ON paciente.cpf=diagnostico.cpf\
+					WHERE funcionario.ID="+medId+";")
 
 				header = [["Nome", "Patologia", "Sintomas"]]
 				imprimir_resposta(cur.fetchall(), header)
+
+			elif (entry == '5'):
+				cur.execute("SELECT paciente.Nome, data FROM funcionario\
+					INNER JOIN consulta ON consulta.ID=funcionario.ID\
+					INNER JOIN paciente ON paciente.cpf=consulta.cpf\
+					WHERE funcionario.ID="+medId+"\
+					ORDER BY data;")
+
+				header = [["Nome", "Data"]]
+				imprimir_resposta(cur.fetchall(), header)
+
+			# Caso escolha consultar internação de paciente
+			elif (entry == '6'):
+				print("Escolha o tipo de consulta a fazer:\
+					\n\t1 - Consultar lista de internações\
+					\n\t2 - Consultar internação por CPF\
+					\n\t3 - Consultar internação por nome\
+					\n\tPara sair escolha 0")
+				entry = input("Escolha um numero: ")
+
+				if (entry == '0'):
+					continue
+				
+				elif (entry == '1'):
+					cur.execute("SELECT nome, idsala, data_entrada, data_alta FROM Paciente\
+						INNER JOIN Internacao ON Internacao.CPF=Paciente.CPF\
+						ORDER BY data_entrada;")
+					
+					header = [["Paciente", "Sala", "Data de entrada", "Data de alta"]]
+					imprimir_resposta(cur.fetchall(), header)
+
+				elif (entry == '2'):
+					cpfPaciente = input("Escolha CPF: ")
+					cur.execute("SELECT nome, idsala, data_entrada, data_alta FROM Paciente\
+						INNER JOIN Internacao ON Internacao.CPF=Paciente.CPF\
+						WHERE Paciente.CPF='"+cpfPaciente+"';")
+				
+					header = [["Paciente", "Sala", "Data de entrada", "Data de alta"]]
+					imprimir_resposta(cur.fetchall(), header)
+
+				elif (entry == '3'):
+					nomePaciente = input("Escolha o nome do paciente: ")
+					cur.execute("SELECT nome, paciente.cpf, idsala, data_entrada, data_alta FROM Paciente\
+						INNER JOIN Internacao ON Internacao.CPF=Paciente.CPF\
+						WHERE Paciente.Nome LIKE '%"+nomePaciente+"%';")
+				
+					header = [["Paciente", "CPF", "Sala", "Data de entrada", "Data de alta"]]
+					imprimir_resposta(cur.fetchall(), header)
+
+			elif (entry == '7'):
+				print("Escolha o tipo de consulta a fazer:\
+					\n\t1 - Médicos\
+					\n\t2 - Enfermeiros\
+					\n\tPara sair escolha 0")
+				entry = input("Escolha un numero: ")
+					
+				if (entry == '0'):
+					continue
+
+				elif (entry == '1'):
+					cur.execute("SELECT nome, cpf, crm, especialidade FROM medico\
+						INNER JOIN funcionario ON medico.id = funcionario.id;")
+
+					header = [["Nome", "CPF", "CRM", "Especialidade"]]
+					imprimir_resposta(cur.fetchall(), header)
+					
+				elif (entry == '2'):
+					cur.execute("SELECT nome, cpf, setor FROM enfermeiro\
+						INNER JOIN funcionario ON enfermeiro.id = funcionario.id;")
+
+					header = [["Nome", "CPF", "Setor"]]
+					imprimir_resposta(cur.fetchall(), header)
 
 	# Caso seja enfermeiro
 	elif (entry == '2'):
@@ -142,9 +220,10 @@ while (1):
 		while(1):
 			clear()
 			print("Escolha o tipo de consulta a fazer:\
-				\n\t1 - Consultar cirurgias\
-				\n\t2 - Consultar paciente por nome\
-				\n\t3 - Consultar internações\
+				\n\t1 - Cirurgias\
+				\n\t2 - Pacientes cadastrados\
+				\n\t3 - Internações\
+				\n\t4 - Funcionários\
 				\n\tPara sair escolha 0")
 			entry = input("Escolha um número: ")
 
@@ -166,20 +245,71 @@ while (1):
 			elif (entry == '2'):
 				nomePaciente = input("Digite o nome desejado: ")
 				cur.execute("SELECT nome, cpf, datanascimento, genero, tiposang\
-					FROM Paciente WHERE Nome='"+nomePaciente+"';")
+					FROM Paciente WHERE Nome LIKE '%"+nomePaciente+"%';")
 				
 				header = [["Nome", "CPF", "Data Nascimento", "Gênero", "Tipo Sanguíneo"]]
 				imprimir_resposta(cur.fetchall(), header)
 
 			# Caso escolha consultar internação de paciente
 			elif (entry == '3'):
-				cpfPaciente = input("Digite o CPF do paciente: ")
-				cur.execute("SELECT nome, idsala, data_entrada, data_alta FROM Paciente\
-					INNER JOIN Internacao ON Internacao.CPF=Paciente.CPF\
-					WHERE Paciente.CPF='"+cpfPaciente+"';")
+				print("Escolha o tipo de consulta a fazer:\
+					\n\t1 - Consultar lista de internações\
+					\n\t2 - Consultar internação por CPF\
+					\n\t3 - Consultar internação por nome\
+					\n\tPara sair escolha 0")
+				entry = input("Escolha um numero: ")
+
+				if (entry == '0'):
+					continue
 				
-				header = [["Paciente", "Sala", "Data de entrada", "Data de alta"]]
-				imprimir_resposta(cur.fetchall(), header)
+				elif (entry == '1'):
+					cur.execute("SELECT nome, idsala, data_entrada, data_alta FROM Paciente\
+						INNER JOIN Internacao ON Internacao.CPF=Paciente.CPF;")
+					
+					header = [["Paciente", "Sala", "Data de entrada", "Data de alta"]]
+					imprimir_resposta(cur.fetchall(), header)
+
+				elif (entry == '2'):
+					cpfPaciente = input("Escolha CPF: ")
+					cur.execute("SELECT nome, idsala, data_entrada, data_alta FROM Paciente\
+						INNER JOIN Internacao ON Internacao.CPF=Paciente.CPF\
+						WHERE Paciente.CPF='"+cpfPaciente+"';")
+				
+					header = [["Paciente", "Sala", "Data de entrada", "Data de alta"]]
+					imprimir_resposta(cur.fetchall(), header)
+
+				elif (entry == '3'):
+					nomePaciente = input("Escolha o nome do paciente: ")
+					cur.execute("SELECT nome, paciente.cpf, idsala, data_entrada, data_alta FROM Paciente\
+						INNER JOIN Internacao ON Internacao.CPF=Paciente.CPF\
+						WHERE Paciente.Nome LIKE '%"+nomePaciente+"%';")
+				
+					header = [["Paciente", "CPF", "Sala", "Data de entrada", "Data de alta"]]
+					imprimir_resposta(cur.fetchall(), header)
+
+			elif (entry == '4'):
+				print("Escolha o tipo de consulta a fazer:\
+					\n\t1 - Médicos\
+					\n\t2 - Enfermeiros\
+					\n\tPara sair escolha 0")
+				entry = input("Escolha un numero: ")
+					
+				if (entry == '0'):
+					continue
+
+				elif (entry == '1'):
+					cur.execute("SELECT nome, cpf, crm, especialidade FROM medico\
+						INNER JOIN funcionario ON medico.id = funcionario.id;")
+
+					header = [["Nome", "CPF", "CRM", "Especialidade"]]
+					imprimir_resposta(cur.fetchall(), header)
+					
+				elif (entry == '2'):
+					cur.execute("SELECT nome, cpf, setor FROM enfermeiro\
+						INNER JOIN funcionario ON enfermeiro.id = funcionario.id;")
+
+					header = [["Nome", "CPF", "Setor"]]
+					imprimir_resposta(cur.fetchall(), header)
 
 	# Caso seja paciente
 	elif (entry == '3'):
@@ -188,10 +318,11 @@ while (1):
 		while(1):
 			clear()
 			print("Escolha o tipo de consulta a fazer:\
-				\n\t1 - Consultar cirurgias a fazer\
-				\n\t2 - Consultar internação\
-				\n\t3 - Constular exames\
-				\n\t4 - Consultar diagnósticos\
+				\n\t1 - Cirurgias\
+				\n\t2 - Internação\
+				\n\t3 - Exames\
+				\n\t4 - Diagnósticos\
+				\n\t5 - Consultas\
 				\n\tPara sair escolha 0")
 			entry = input("Escolha um número: ")
 
@@ -235,6 +366,18 @@ while (1):
 			
 				header=[["Médico responsável", "Diagnóstico", "Sintomas"]]
 				imprimir_resposta(cur.fetchall(), header)
+			
+			# Caso escolha consultas
+			elif (entry == '5'):
+				cur.execute("SELECT funcionario.nome, data FROM paciente\
+					INNER JOIN consulta ON paciente.CPF=consulta.CPF\
+					INNER JOIN funcionario ON funcionario.id=consulta.id\
+					WHERE paciente.CPF='"+cpfPaciente+"'\
+					ORDER BY data;")
+			
+				header=[["Médico responsável", "Data"]]
+				imprimir_resposta(cur.fetchall(), header)
+
 
 	else:
 		print("Entrada não válida\n")

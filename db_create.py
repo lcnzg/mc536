@@ -28,6 +28,7 @@ cur = db.cursor()
 setup_commands = generate_database()
 
 print("Limpando tabelas")
+cur.execute("DROP TABLE IF EXISTS ajuda_em;") 
 cur.execute("DROP TABLE IF EXISTS realiza_cirurgia;") 
 cur.execute("DROP TABLE IF EXISTS cirurgia;") 
 cur.execute("DROP TABLE IF EXISTS exame;") 
@@ -81,14 +82,33 @@ while (1):
 
 			# Caso escolha cirurgia
 			elif (entry == '1'):
-				cur.execute("SELECT paciente.nome, idsala, tipo, data, horario FROM funcionario\
-					INNER JOIN realiza_cirurgia ON realiza_cirurgia.ID=funcionario.ID\
-					INNER JOIN cirurgia ON cirurgia.ncirurgia=realiza_cirurgia.ncirurgia\
-					INNER JOIN paciente ON cirurgia.cpf=paciente.cpf\
-					WHERE funcionario.ID="+medId+";")
+				print("Escolha o tipo de consulta a fazer:\
+					\n\t1 - Cirurgias sob sua responsabilidade\
+					\n\t2 - Enfermeiros ajudantes em cirurgia\
+					\n\t0 - Para retornar")
+				entry = input("Escolha um número: ")
+				if (entry == '0'):
+					continue
 
-				header = [["Paciente", "Sala", "Tipo", "Data", "Horário"]]
-				imprimir_resposta(cur.fetchall(), header)
+				elif (entry == '1'):
+					cur.execute("SELECT cirurgia.ncirurgia, paciente.nome, idsala, tipo, data, horario FROM funcionario\
+						INNER JOIN realiza_cirurgia ON realiza_cirurgia.ID=funcionario.ID\
+						INNER JOIN cirurgia ON cirurgia.ncirurgia=realiza_cirurgia.ncirurgia\
+						INNER JOIN paciente ON cirurgia.cpf=paciente.cpf\
+						WHERE funcionario.ID="+medId+"\
+						ORDER BY data;")
+
+					header = [["ID Cirurgia", "Paciente", "Sala", "Tipo", "Data", "Horário"]]
+					imprimir_resposta(cur.fetchall(), header)
+
+				elif (entry == '2'):
+					ncirurgia = input("Escolha ID da cirurgia: ")
+					cur.execute("SELECT nome FROM funcionario, enfermeiro, ajuda_em\
+						WHERE ncirurgia="+ncirurgia+" AND enfermeiro.id=funcionario.id\
+						AND enfermeiro.id=ajuda_em.id;")
+
+					header = [["Nome"]]
+					imprimir_resposta(cur.fetchall(), header)
 			
 			#Caso escolha consultar pacientes
 			elif (entry == '2'):
@@ -207,10 +227,10 @@ while (1):
 					imprimir_resposta(cur.fetchall(), header)
 					
 				elif (entry == '2'):
-					cur.execute("SELECT nome, cpf, setor FROM enfermeiro\
+					cur.execute("SELECT enfermeiro.ID, nome, cpf, setor FROM enfermeiro\
 						INNER JOIN funcionario ON enfermeiro.id = funcionario.id;")
 
-					header = [["Nome", "CPF", "Setor"]]
+					header = [["ID", "Nome", "CPF", "Setor"]]
 					imprimir_resposta(cur.fetchall(), header)
 
 	# Caso seja enfermeiro
@@ -224,22 +244,41 @@ while (1):
 				\n\t2 - Pacientes cadastrados\
 				\n\t3 - Internações\
 				\n\t4 - Funcionários\
-				\n\tPara sair escolha 0")
+				\n\t0 - Para sair")
 			entry = input("Escolha um número: ")
 
 			if (entry == '0'):
 				break
 
-			# Caso escolha cirurgias	
+			# Caso escolha cirurgia
 			elif (entry == '1'):
-				cur.execute("SELECT paciente.nome, idsala, tipo, data, horario  FROM funcionario\
-					INNER JOIN Realiza_cirurgia ON funcionario.ID=Realiza_cirurgia.ID\
-					INNER JOIN cirurgia ON cirurgia.ncirurgia=realiza_cirurgia.ncirurgia\
-					INNER JOIN paciente ON cirurgia.CPF=paciente.CPF\
-					WHERE funcionario.Id='"+enfId+"';")
-				
-				header = [["Paciente", "Sala", "Tipo", "Data", "Horário"]]
-				imprimir_resposta(cur.fetchall(), header)
+				print("Escolha o tipo de consulta a fazer:\
+					\n\t1 - Cirurgias nas quais ajuda\
+					\n\t2 - Enfermeiros ajudantes em cirurgia\
+					\n\t0 - Para retornar")
+				entry = input("Escolha um número: ")
+				if (entry == '0'):
+					continue
+
+				elif (entry == '1'):
+					cur.execute("SELECT cirurgia.ncirurgia, paciente.nome, idsala, tipo, data, horario FROM funcionario\
+						INNER JOIN ajuda_em ON ajuda_em.ID=funcionario.ID\
+						INNER JOIN cirurgia ON cirurgia.ncirurgia=ajuda_em.ncirurgia\
+						INNER JOIN paciente ON cirurgia.cpf=paciente.cpf\
+						WHERE funcionario.ID="+enfId+"\
+						ORDER BY data;")
+
+					header = [["ID Cirurgia", "Paciente", "Sala", "Tipo", "Data", "Horário"]]
+					imprimir_resposta(cur.fetchall(), header)
+
+				elif (entry == '2'):
+					ncirurgia = input("Escolha ID da cirurgia: ")
+					cur.execute("SELECT nome FROM funcionario, enfermeiro, ajuda_em\
+						WHERE ncirurgia="+ncirurgia+" AND enfermeiro.id=funcionario.id\
+						AND enfermeiro.id=ajuda_em.id;")
+
+					header = [["Nome"]]
+					imprimir_resposta(cur.fetchall(), header)
 
 			# Caso escolha consultar paciente por nome
 			elif (entry == '2'):
@@ -256,7 +295,7 @@ while (1):
 					\n\t1 - Consultar lista de internações\
 					\n\t2 - Consultar internação por CPF\
 					\n\t3 - Consultar internação por nome\
-					\n\tPara sair escolha 0")
+					\n\t0 - Para sair")
 				entry = input("Escolha um numero: ")
 
 				if (entry == '0'):
@@ -291,7 +330,7 @@ while (1):
 				print("Escolha o tipo de consulta a fazer:\
 					\n\t1 - Médicos\
 					\n\t2 - Enfermeiros\
-					\n\tPara sair escolha 0")
+					\n\t0 - Para sair")
 				entry = input("Escolha un numero: ")
 					
 				if (entry == '0'):
@@ -323,7 +362,7 @@ while (1):
 				\n\t3 - Exames\
 				\n\t4 - Diagnósticos\
 				\n\t5 - Consultas\
-				\n\tPara sair escolha 0")
+				\n\t0 - Para sair")
 			entry = input("Escolha um número: ")
 
 			if (entry == '0'):

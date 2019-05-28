@@ -383,6 +383,7 @@ def generate_database():
     'CREATE TABLE Sala (IDSala int NOT NULL, Tipo varchar(50), Capacidade int, PRIMARY KEY(IDSala));',
     'CREATE TABLE Cirurgia (NCirurgia int NOT NULL, IDSala int NOT NULL, CPF varchar(11) NOT NULL, Tipo varchar(50) NOT NULL, Data Date NOT NULL, Horario Time(0) NOT NULL, PRIMARY KEY(NCirurgia), FOREIGN KEY (IDSala) REFERENCES Sala(IDSala), FOREIGN KEY (CPF) REFERENCES Paciente(CPF));',
     'CREATE TABLE Realiza_cirurgia (NCirurgia int NOT NULL, ID int NOT NULL, FOREIGN KEY (NCirurgia) REFERENCES Cirurgia(NCirurgia), FOREIGN KEY (ID) REFERENCES Funcionario(ID));',
+    'CREATE TABLE Ajuda_em(NCirurgia int NOT NULL, ID int NOT NULL, FOREIGN KEY (NCirurgia) REFERENCES Cirurgia(NCirurgia), FOREIGN KEY (ID) REFERENCES Enfermeiro(ID));',
     'CREATE TABLE Internacao (IDSala int NOT NULL, CPF varchar(11) NOT NULL, Data_entrada Date NOT NULL, Data_alta Date, PRIMARY KEY (CPF, Data_entrada), FOREIGN KEY (IDSala) REFERENCES Sala(IDSala), FOREIGN KEY (CPF) REFERENCES Paciente(CPF));',
     'CREATE TABLE Consulta (ID int NOT NULL, CPF varchar(11) NOT NULL, Data Date NOT NULL, PRIMARY KEY (ID,CPF,Data), FOREIGN KEY (ID) REFERENCES Medico(ID), FOREIGN KEY (CPF) REFERENCES Paciente(CPF));'
     ])
@@ -427,15 +428,15 @@ def generate_database():
         setup_commands.append("INSERT INTO Realiza_cirurgia VALUES("+str(ncirurgia)+", "+str(medico2)+");")
 
         enf1 = choice(enfermeiros)[0]
-        setup_commands.append("INSERT INTO Realiza_cirurgia VALUES("+str(ncirurgia)+", "+str(enf1)+");")
+        setup_commands.append("INSERT INTO Ajuda_em VALUES("+str(ncirurgia)+", "+str(enf1)+");")
         enf2 = choice(enfermeiros)[0]
         while (enf2 == enf1):
           enf2 = choice(enfermeiros)[0] 
-        setup_commands.append("INSERT INTO Realiza_cirurgia VALUES("+str(ncirurgia)+", "+str(enf2)+");")
+        setup_commands.append("INSERT INTO Ajuda_em VALUES("+str(ncirurgia)+", "+str(enf2)+");")
         enf3 = choice(enfermeiros)[0]
         while (enf3 == enf2 or enf3 == enf1):
             enf3 = choice(enfermeiros)[0]
-        setup_commands.append("INSERT INTO Realiza_cirurgia VALUES("+str(ncirurgia)+", "+str(enf3)+");")
+        setup_commands.append("INSERT INTO Ajuda_em VALUES("+str(ncirurgia)+", "+str(enf3)+");")
 
     # Internacao
     for (idsala,cpf,data_entrada,data_alta) in internacoes:

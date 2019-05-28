@@ -3,6 +3,9 @@ import pymysql
 import os
 from data_gen import generate_database
 
+# Cria comando para limpar tela do terminal do windows
+clear = lambda: os.system('cls')
+
 def imprimir_resposta(response, header):
 	if (response):
 		width_res = max(len(str(word)) for row in response for word in row)
@@ -11,13 +14,14 @@ def imprimir_resposta(response, header):
 		
 		for row in header:
 			print ("".join(str(word).ljust(col_width) for word in row))
+		print()
 		for row in response:
 			print("".join(str(word).ljust(col_width) for word in row))
 		input("Aperte Enter ao terminar")
 	else:
 		input("Nenhum registro encontrado. Aperte Enter para retornar")
 
-clear = lambda: os.system('cls')
+
 
 # Open database connection
 print("Conectanto ao banco")

@@ -6,6 +6,12 @@ from data_gen import generate_database
 # Cria comando para limpar tela do terminal do windows
 clear = lambda: os.system('cls')
 
+def is_empty(struct):
+	if(struct):
+		return False
+	else:
+		return True
+
 def imprimir_resposta(response, header):
 	if (response):
 		width_res = max(len(str(word)) for row in response for word in row)
@@ -67,6 +73,10 @@ while (1):
 	# Caso seja médico
 	elif (entry == '1'):
 		medId = input("Digite seu ID: ")
+		cur.execute("SELECT id FROM medico WHERE id="+medId+";")
+		if(is_empty(cur.fetchall())):
+			input("Medico nao encontrado. Pressione Enter para voltar")
+			continue
 
 		while(1):
 			clear()
@@ -240,6 +250,10 @@ while (1):
 	# Caso seja enfermeiro
 	elif (entry == '2'):
 		enfId = input("Digite seu ID: ")
+		cur.execute("SELECT id FROM enfermeiro WHERE id="+enfId+";")
+		if(is_empty(cur.fetchall())):
+			input("Enfermeiro nao encontrado. Pressione Enter para voltar")
+			continue
 
 		while(1):
 			clear()
@@ -357,6 +371,10 @@ while (1):
 	# Caso seja paciente
 	elif (entry == '3'):
 		cpfPaciente = input("Digite seu CPF: ")
+		cur.execute("SELECT cpf FROM paciente WHERE cpf="+cpfPaciente+";")
+		if(is_empty(cur.fetchall())):
+			input("Paciente nao encontrado. Pressione Enter para voltar")
+			continue
 
 		while(1):
 			clear()

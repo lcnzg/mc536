@@ -382,10 +382,10 @@ def generate_database():
     'CREATE TABLE Diagnostico (NDiag int NOT NULL, Patologia varchar(100), Sintomas varchar(500), CPF varchar(11) NOT NULL, IDMedico int NOT NULL, PRIMARY KEY(NDiag), FOREIGN KEY (CPF) REFERENCES Paciente(CPF), FOREIGN KEY (IDMedico) REFERENCES Medico(ID));',
     'CREATE TABLE Sala (IDSala int NOT NULL, Tipo varchar(50), Capacidade int, PRIMARY KEY(IDSala));',
     'CREATE TABLE Cirurgia (NCirurgia int NOT NULL, Tipo varchar(50) NOT NULL, Data Date NOT NULL, Horario Time(0) NOT NULL, IDSala int NOT NULL, CPF varchar(11) NOT NULL, PRIMARY KEY(NCirurgia), FOREIGN KEY (IDSala) REFERENCES Sala(IDSala), FOREIGN KEY (CPF) REFERENCES Paciente(CPF));',
-    'CREATE TABLE Realiza_cirurgia (NCirurgia int NOT NULL, ID int NOT NULL, FOREIGN KEY (NCirurgia) REFERENCES Cirurgia(NCirurgia), FOREIGN KEY (ID) REFERENCES Funcionario(ID));',
-    'CREATE TABLE Ajuda_em(NCirurgia int NOT NULL, ID int NOT NULL, FOREIGN KEY (NCirurgia) REFERENCES Cirurgia(NCirurgia), FOREIGN KEY (ID) REFERENCES Enfermeiro(ID));',
+    'CREATE TABLE Realiza_cirurgia (ID int NOT NULL, NCirurgia int NOT NULL, FOREIGN KEY (NCirurgia) REFERENCES Cirurgia(NCirurgia), FOREIGN KEY (ID) REFERENCES Funcionario(ID));',
+    'CREATE TABLE Ajuda_em(ID int NOT NULL, NCirurgia int NOT NULL, FOREIGN KEY (NCirurgia) REFERENCES Cirurgia(NCirurgia), FOREIGN KEY (ID) REFERENCES Enfermeiro(ID));',
     'CREATE TABLE Internacao (CPF varchar(11) NOT NULL, Data_entrada Date NOT NULL, Data_alta Date, IDMedico int NOT NULL, IDSala int NOT NULL, PRIMARY KEY (CPF, Data_entrada), FOREIGN KEY (IDSala) REFERENCES Sala(IDSala), FOREIGN KEY (CPF) REFERENCES Paciente(CPF), FOREIGN KEY (IDMedico) REFERENCES Medico(ID));',
-    'CREATE TABLE Consulta (ID int NOT NULL, CPF varchar(11) NOT NULL, Data Date NOT NULL, PRIMARY KEY (ID,CPF,Data), FOREIGN KEY (ID) REFERENCES Medico(ID), FOREIGN KEY (CPF) REFERENCES Paciente(CPF));'
+    'CREATE TABLE Consulta (CPF varchar(11) NOT NULL, ID int NOT NULL, Data Date NOT NULL, PRIMARY KEY (ID,CPF,Data), FOREIGN KEY (ID) REFERENCES Medico(ID), FOREIGN KEY (CPF) REFERENCES Paciente(CPF));'
     ])
 
     #### POPULANDO BANCO DE DADOS ###############
@@ -421,22 +421,22 @@ def generate_database():
         setup_commands.append("INSERT INTO Cirurgia VALUES ("+str(ncirurgia)+",'"+tipo+"','"+data+"','"+horario+"','"+str(idsala)+"','"+str(cpf)+"');")
 
         medico1 = choice(medicos)[0]
-        setup_commands.append("INSERT INTO Realiza_cirurgia VALUES("+str(ncirurgia)+", "+str(medico1)+");")
+        setup_commands.append("INSERT INTO Realiza_cirurgia VALUES("+str(medico1)+", "+str(ncirurgia)+");")
         medico2 = choice(medicos)[0]
         while (medico2 == medico1):
           medico2 = choice(medicos)[0]
-        setup_commands.append("INSERT INTO Realiza_cirurgia VALUES("+str(ncirurgia)+", "+str(medico2)+");")
+        setup_commands.append("INSERT INTO Realiza_cirurgia VALUES("+str(medico2)+", "+str(ncirurgia)+");")
 
         enf1 = choice(enfermeiros)[0]
-        setup_commands.append("INSERT INTO Ajuda_em VALUES("+str(ncirurgia)+", "+str(enf1)+");")
+        setup_commands.append("INSERT INTO Ajuda_em VALUES("+str(enf1)+", "+str(ncirurgia)+");")
         enf2 = choice(enfermeiros)[0]
         while (enf2 == enf1):
           enf2 = choice(enfermeiros)[0]
-        setup_commands.append("INSERT INTO Ajuda_em VALUES("+str(ncirurgia)+", "+str(enf2)+");")
+        setup_commands.append("INSERT INTO Ajuda_em VALUES("+str(enf2)+", "+str(ncirurgia)+");")
         enf3 = choice(enfermeiros)[0]
         while (enf3 == enf2 or enf3 == enf1):
             enf3 = choice(enfermeiros)[0]
-        setup_commands.append("INSERT INTO Ajuda_em VALUES("+str(ncirurgia)+", "+str(enf3)+");")
+        setup_commands.append("INSERT INTO Ajuda_em VALUES("+str(enf3)+", "+str(ncirurgia)+");")
 
     # Internacao
     for (idsala,cpf,data_entrada,data_alta) in internacoes:
@@ -444,6 +444,6 @@ def generate_database():
 
     # Consulta
     for (id,cpf,data) in consultas:
-        setup_commands.append("INSERT INTO Consulta VALUES ("+str(id)+",'"+str(cpf)+"','"+data+"');")
+        setup_commands.append("INSERT INTO Consulta VALUES ('"+str(cpf)+"','"+str(id)+"','"+data+"');")
 
     return setup_commands

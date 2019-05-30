@@ -47,7 +47,7 @@ cur.execute("DROP TABLE IF EXISTS sala;")
 
 print("Gerando dados")
 for command in setup_commands:
-  cur.execute(command)
+	cur.execute(command)
 
 print("Submetendo comandos")
 db.commit()

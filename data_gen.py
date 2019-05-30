@@ -440,7 +440,7 @@ def generate_database():
 
     # Internacao
     for (idsala,cpf,data_entrada,data_alta) in internacoes:
-        setup_commands.append("INSERT INTO Internacao VALUES ("+str(cpf)+",'"+data_entrada+"','"+data_alta+"','"+str(choice(medicos)[0])+"','"+str(idsala)+"');")
+        setup_commands.append("INSERT INTO Internacao VALUES ('"+str(cpf)+"','"+data_entrada+"','"+data_alta+"','"+str(choice(medicos)[0])+"','"+str(idsala)+"');")
 
     # Consulta
     for (id,cpf,data) in consultas:

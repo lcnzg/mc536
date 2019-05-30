@@ -37,26 +37,31 @@ cur = db.cursor()
 
 setup_commands = generate_database()
 
-print("Limpando tabelas")
-cur.execute("DROP TABLE IF EXISTS ajuda_em;") 
-cur.execute("DROP TABLE IF EXISTS realiza_cirurgia;") 
-cur.execute("DROP TABLE IF EXISTS cirurgia;") 
-cur.execute("DROP TABLE IF EXISTS exame;") 
-cur.execute("DROP TABLE IF EXISTS consulta;") 
-cur.execute("DROP TABLE IF EXISTS diagnostico;")
-cur.execute("DROP TABLE IF EXISTS internacao;")
-cur.execute("DROP TABLE IF EXISTS medico;")
-cur.execute("DROP TABLE IF EXISTS paciente;")
-cur.execute("DROP TABLE IF EXISTS enfermeiro;")
-cur.execute("DROP TABLE IF EXISTS funcionario;")  
-cur.execute("DROP TABLE IF EXISTS sala;") 
+cur.execute("SELECT * FROM medico;")
+response = cur.fetchall()
+if(len(response) >= 20):
+	entry = input("Existem tabelas preenchidas, deseja criar novas? (y/n): ")
+	if (entry.lower == 'y'):
+		print("Limpando tabelas")
+		cur.execute("DROP TABLE IF EXISTS ajuda_em;") 
+		cur.execute("DROP TABLE IF EXISTS realiza_cirurgia;") 
+		cur.execute("DROP TABLE IF EXISTS cirurgia;") 
+		cur.execute("DROP TABLE IF EXISTS exame;") 
+		cur.execute("DROP TABLE IF EXISTS consulta;") 
+		cur.execute("DROP TABLE IF EXISTS diagnostico;")
+		cur.execute("DROP TABLE IF EXISTS internacao;")
+		cur.execute("DROP TABLE IF EXISTS medico;")
+		cur.execute("DROP TABLE IF EXISTS paciente;")
+		cur.execute("DROP TABLE IF EXISTS enfermeiro;")
+		cur.execute("DROP TABLE IF EXISTS funcionario;")  
+		cur.execute("DROP TABLE IF EXISTS sala;") 
 
-print("Gerando dados")
-for command in setup_commands:
-	cur.execute(command)
+		print("Gerando dados")
+		for command in setup_commands:
+			cur.execute(command)
 
-print("Submetendo comandos")
-db.commit()
+		print("Submetendo comandos")
+		db.commit()
 
 while (1):
 	clear()
@@ -247,6 +252,10 @@ while (1):
 					header = [["ID", "Nome", "CPF", "Setor"]]
 					imprimir_resposta(cur.fetchall(), header)
 
+			else:
+				input("Entrada inválida. Tente novamente")
+				continue
+
 	# Caso seja enfermeiro
 	elif (entry == '2'):
 		enfId = input("Digite seu ID: ")
@@ -367,6 +376,10 @@ while (1):
 
 					header = [["Nome", "CPF", "Setor"]]
 					imprimir_resposta(cur.fetchall(), header)
+			
+			else:
+				input("Entrada inválida. Tente novamente")
+				continue
 
 	# Caso seja paciente
 	elif (entry == '3'):
@@ -439,8 +452,11 @@ while (1):
 				header=[["Médico responsável", "Data"]]
 				imprimir_resposta(cur.fetchall(), header)
 
+			else:
+				input("Entrada inválida. Tente novamente")
+				continue
 
 	else:
-		print("Entrada não válida\n")
+		input("Entrada inválida. Tente novamente")
 
 db.close()

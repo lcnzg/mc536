@@ -172,13 +172,28 @@ while (1):
 
 			# Caso escolha consultar diagnósticos feitos
 			elif (entry == '4'):
-				cur.execute("SELECT Paciente.Nome, Patologia, SIntomas FROM funcionario\
-					INNER JOIN Diagnostico ON Diagnostico.IDmedico=funcionario.ID\
-					INNER JOIN paciente ON paciente.cpf=diagnostico.cpf\
-					WHERE funcionario.ID="+medId+";")
+				print("Escolha o tipo de consulta:\
+					\n\t1 - Diagnósticos dados\
+					\n\t2 - Número de diagnósticos por patologia\
+					\n\t0 - Para sair escolha")
+				entry = input("Escolha um numero: ")
+				if (entry == '0'):
+					continue
 
-				header = [["Nome", "Patologia", "Sintomas"]]
-				imprimir_resposta(cur.fetchall(), header)
+				elif (entry == '1'):				
+					cur.execute("SELECT Paciente.Nome, Patologia, SIntomas FROM funcionario\
+						INNER JOIN Diagnostico ON Diagnostico.IDmedico=funcionario.ID\
+						INNER JOIN paciente ON paciente.cpf=diagnostico.cpf\
+						WHERE funcionario.ID="+medId+";")
+
+					header = [["Nome", "Patologia", "Sintomas"]]
+					imprimir_resposta(cur.fetchall(), header)
+				
+				elif (entry == '2'):
+					entry = input("Escolha uma patologia: ")
+					cur.execute("SELECT COUNT(*) FROM Diagnostico WHERE patologia = '"+entry+"';")
+					header = [["Numero de diagnosticos de "+entry]]
+					imprimir_resposta(cur.fetchall(), header)
 
 			elif (entry == '5'):
 				cur.execute("SELECT paciente.Nome, data FROM funcionario\
@@ -196,6 +211,8 @@ while (1):
 					\n\t1 - Consultar lista de internações\
 					\n\t2 - Consultar internação por CPF\
 					\n\t3 - Consultar internação por nome\
+					\n\t4 - Consultar numero de pacientes com certa patologia\
+					\n\t5 - Constular numero de pacientes em certa sala\
 					\n\tPara sair escolha 0")
 				entry = input("Escolha um numero: ")
 
@@ -226,6 +243,24 @@ while (1):
 						WHERE Paciente.Nome LIKE '%"+nomePaciente+"%';")
 				
 					header = [["Paciente", "CPF", "Sala", "Data de entrada", "Data de alta"]]
+					imprimir_resposta(cur.fetchall(), header)
+
+				elif (entry == '4'):
+					patologia = input("Escolha a patologia: ")
+					cur.execute("SELECT paciente.cpf, nome, datanascimento, genero, tiposang FROM\
+						internacao, paciente, diagnostico WHERE internacao.cpf = paciente.cpf AND\
+						diagnostico.cpf = paciente.cpf and patologia='"+patologia+"';")
+					header = [["CPF", "Nome", "Data Nascimento", "Genero", "Tipo" "Sanguineo"]]	
+					imprimir_resposta(cur.fetchall(), header)
+
+				elif (entry == '5'):
+					idsala = input("Escolha a sala: ")
+					cur.execute("SELECT idsala FROM sala WHERE sala.idsala="+idsala+";")
+					if(is_empty(cur.fetchall())):
+						input("Sala nao encontrada. Pressione Enter para retornar")
+						continue
+					cur.execute("SELECT Count(CPF) FROM internacao WHERE internacao.idsala="+idsala+";")
+					header = [["Numero de pacientes na sala "+str(idsala)]]	
 					imprimir_resposta(cur.fetchall(), header)
 
 			elif (entry == '7'):

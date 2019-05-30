@@ -378,13 +378,13 @@ def generate_database():
     'CREATE TABLE Medico (ID int NOT NULL, CRM varchar(12) NOT NULL, Especialidade varchar(50), PRIMARY KEY(ID), FOREIGN KEY (ID) REFERENCES Funcionario(ID));',
     'CREATE TABLE Enfermeiro (ID int NOT NULL, Setor varchar(50), PRIMARY KEY(ID), FOREIGN KEY (ID) REFERENCES Funcionario(ID));',
     'CREATE TABLE Paciente (CPF varchar(11) NOT NULL, Nome varchar(50) NOT NULL, DataNascimento DATE NOT NULL, Genero char(1) NOT NULL, TipoSang varchar(3) NOT NULL, PRIMARY KEY(CPF));',
-    'CREATE TABLE Exame (NExame int NOT NULL, ID_medico int NOT NULL, CPF varchar(11) NOT NULL, Tipo varchar(50) NOT NULL, Data Date, Horario Time(0), Local varchar(50), PRIMARY KEY(NExame), FOREIGN KEY (ID_medico) REFERENCES Medico(ID), FOREIGN KEY (CPF) REFERENCES Paciente(CPF));',
-    'CREATE TABLE Diagnostico (NDiag int NOT NULL, CPF varchar(11) NOT NULL, IDMedico int NOT NULL, Patologia varchar(100), Sintomas varchar(500), PRIMARY KEY(NDiag), FOREIGN KEY (CPF) REFERENCES Paciente(CPF), FOREIGN KEY (IDMedico) REFERENCES Medico(ID));',
+    'CREATE TABLE Exame (NExame int NOT NULL, Tipo varchar(50) NOT NULL, Data Date, Horario Time(0), Local varchar(50), CPF varchar(11) NOT NULL, ID_medico int NOT NULL, PRIMARY KEY(NExame), FOREIGN KEY (ID_medico) REFERENCES Medico(ID), FOREIGN KEY (CPF) REFERENCES Paciente(CPF));',
+    'CREATE TABLE Diagnostico (NDiag int NOT NULL, Patologia varchar(100), Sintomas varchar(500), CPF varchar(11) NOT NULL, IDMedico int NOT NULL, PRIMARY KEY(NDiag), FOREIGN KEY (CPF) REFERENCES Paciente(CPF), FOREIGN KEY (IDMedico) REFERENCES Medico(ID));',
     'CREATE TABLE Sala (IDSala int NOT NULL, Tipo varchar(50), Capacidade int, PRIMARY KEY(IDSala));',
-    'CREATE TABLE Cirurgia (NCirurgia int NOT NULL, IDSala int NOT NULL, CPF varchar(11) NOT NULL, Tipo varchar(50) NOT NULL, Data Date NOT NULL, Horario Time(0) NOT NULL, PRIMARY KEY(NCirurgia), FOREIGN KEY (IDSala) REFERENCES Sala(IDSala), FOREIGN KEY (CPF) REFERENCES Paciente(CPF));',
+    'CREATE TABLE Cirurgia (NCirurgia int NOT NULL, Tipo varchar(50) NOT NULL, Data Date NOT NULL, Horario Time(0) NOT NULL, IDSala int NOT NULL, CPF varchar(11) NOT NULL, PRIMARY KEY(NCirurgia), FOREIGN KEY (IDSala) REFERENCES Sala(IDSala), FOREIGN KEY (CPF) REFERENCES Paciente(CPF));',
     'CREATE TABLE Realiza_cirurgia (NCirurgia int NOT NULL, ID int NOT NULL, FOREIGN KEY (NCirurgia) REFERENCES Cirurgia(NCirurgia), FOREIGN KEY (ID) REFERENCES Funcionario(ID));',
     'CREATE TABLE Ajuda_em(NCirurgia int NOT NULL, ID int NOT NULL, FOREIGN KEY (NCirurgia) REFERENCES Cirurgia(NCirurgia), FOREIGN KEY (ID) REFERENCES Enfermeiro(ID));',
-    'CREATE TABLE Internacao (IDSala int NOT NULL, CPF varchar(11) NOT NULL, Data_entrada Date NOT NULL, Data_alta Date, PRIMARY KEY (CPF, Data_entrada), FOREIGN KEY (IDSala) REFERENCES Sala(IDSala), FOREIGN KEY (CPF) REFERENCES Paciente(CPF));',
+    'CREATE TABLE Internacao (CPF varchar(11) NOT NULL, Data_entrada Date NOT NULL, Data_alta Date, IDMedico int NOT NULL, IDSala int NOT NULL, PRIMARY KEY (CPF, Data_entrada), FOREIGN KEY (IDSala) REFERENCES Sala(IDSala), FOREIGN KEY (CPF) REFERENCES Paciente(CPF), FOREIGN KEY (IDMedico) REFERENCES Medico(ID));',
     'CREATE TABLE Consulta (ID int NOT NULL, CPF varchar(11) NOT NULL, Data Date NOT NULL, PRIMARY KEY (ID,CPF,Data), FOREIGN KEY (ID) REFERENCES Medico(ID), FOREIGN KEY (CPF) REFERENCES Paciente(CPF));'
     ])
 
@@ -410,28 +410,28 @@ def generate_database():
 
     # Exame
     for (nexame,cpf,tipo,data,horario,local) in exames:
-        setup_commands.append("INSERT INTO Exame VALUES ("+str(nexame)+",'"+str(choice(medicos)[0])+"', '"+str(cpf)+"','"+tipo+"','"+data+"','"+horario+"','"+str(local)+"');")
+        setup_commands.append("INSERT INTO Exame VALUES ("+str(nexame)+",'"+tipo+"','"+data+"','"+horario+"','"+str(local)+"','"+str(cpf)+"','"+str(choice(medicos)[0])+"');")
 
     # Diagnostico
     for (ndiag,cpf,idmedico,patologia,sintomas) in diagnosticos:
-        setup_commands.append("INSERT INTO Diagnostico VALUES ("+str(ndiag)+",'"+str(cpf)+"',"+str(idmedico)+",'"+patologia+"','"+sintomas+"');")
+        setup_commands.append("INSERT INTO Diagnostico VALUES ("+str(ndiag)+",'"+patologia+"','"+sintomas+"','"+str(cpf)+"','"+str(idmedico)+"');")
 
     # Cirurgia
     for (ncirurgia,idsala,cpf,tipo,data,horario) in cirurgias:
-        setup_commands.append("INSERT INTO Cirurgia VALUES ("+str(ncirurgia)+","+str(idsala)+",'"+str(cpf)+"','"+tipo+"','"+data+"','"+horario+"');")
+        setup_commands.append("INSERT INTO Cirurgia VALUES ("+str(ncirurgia)+",'"+tipo+"','"+data+"','"+horario+"','"+str(idsala)+"','"+str(cpf)+"');")
 
         medico1 = choice(medicos)[0]
         setup_commands.append("INSERT INTO Realiza_cirurgia VALUES("+str(ncirurgia)+", "+str(medico1)+");")
         medico2 = choice(medicos)[0]
         while (medico2 == medico1):
-          medico2 = choice(medicos)[0] 
+          medico2 = choice(medicos)[0]
         setup_commands.append("INSERT INTO Realiza_cirurgia VALUES("+str(ncirurgia)+", "+str(medico2)+");")
 
         enf1 = choice(enfermeiros)[0]
         setup_commands.append("INSERT INTO Ajuda_em VALUES("+str(ncirurgia)+", "+str(enf1)+");")
         enf2 = choice(enfermeiros)[0]
         while (enf2 == enf1):
-          enf2 = choice(enfermeiros)[0] 
+          enf2 = choice(enfermeiros)[0]
         setup_commands.append("INSERT INTO Ajuda_em VALUES("+str(ncirurgia)+", "+str(enf2)+");")
         enf3 = choice(enfermeiros)[0]
         while (enf3 == enf2 or enf3 == enf1):
@@ -440,7 +440,7 @@ def generate_database():
 
     # Internacao
     for (idsala,cpf,data_entrada,data_alta) in internacoes:
-        setup_commands.append("INSERT INTO Internacao VALUES ("+str(idsala)+",'"+str(cpf)+"','"+data_entrada+"','"+data_alta+"');")
+        setup_commands.append("INSERT INTO Internacao VALUES ("+str(cpf)+",'"+data_entrada+"','"+data_alta+"','"+str(choice(medicos)[0])+"','"+str(idsala)+"');")
 
     # Consulta
     for (id,cpf,data) in consultas:
